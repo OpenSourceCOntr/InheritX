@@ -3,7 +3,9 @@
 use super::*;
 use mock_token::MockToken;
 use mock_token::MockTokenClient;
-use soroban_sdk::{testutils::Address as _, testutils::Ledger, token, vec, Address, Bytes, Env, String, Vec};
+use soroban_sdk::{
+    testutils::Address as _, testutils::Ledger, token, vec, Address, Bytes, Env, String, Vec,
+};
 
 /// Test helper for balance and mint (uses mock-token crate client).
 struct TestTokenHelper<'a> {
@@ -2584,10 +2586,7 @@ fn test_emergency_access_cooldown() {
     env.ledger().set_timestamp(1001);
     client.deactivate_emergency_access(&user);
     let result = client.try_activate_emergency_access(&user);
-    assert_eq!(
-        result,
-        Err(Ok(InheritanceError::EmergencyCooldownActive))
-    );
+    assert_eq!(result, Err(Ok(InheritanceError::EmergencyCooldownActive)));
 
     // Activation after 24 hours should succeed
     // 86400 (cooldown) + 1000 (start) = 87400
@@ -2597,8 +2596,5 @@ fn test_emergency_access_cooldown() {
     // After successful re-activation, it should fail again for another 24 hours
     env.ledger().set_timestamp(87401);
     let result = client.try_activate_emergency_access(&user);
-    assert_eq!(
-        result,
-        Err(Ok(InheritanceError::EmergencyCooldownActive))
-    );
+    assert_eq!(result, Err(Ok(InheritanceError::EmergencyCooldownActive)));
 }
