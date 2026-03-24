@@ -170,6 +170,7 @@ pub mod audit_action {
 pub mod entity_type {
     pub const USER: &str = "user";
     pub const PLAN: &str = "plan";
+    pub const LOAN: &str = "loan";
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
