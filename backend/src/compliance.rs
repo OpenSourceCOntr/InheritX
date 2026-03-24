@@ -172,7 +172,12 @@ impl ComplianceEngine {
         Ok(())
     }
 
-    async fn flag_plan(&self, plan_id: Uuid, user_id: Uuid, reason: String) -> Result<(), ApiError> {
+    async fn flag_plan(
+        &self,
+        plan_id: Uuid,
+        user_id: Uuid,
+        reason: String,
+    ) -> Result<(), ApiError> {
         // Check if already flagged for this reason to avoid spam
         let current_flags: Option<String> =
             sqlx::query_scalar("SELECT suspicion_flags FROM plans WHERE id = $1")
@@ -186,7 +191,10 @@ impl ComplianceEngine {
             }
         }
 
-        warn!("Compliance Engine: Flagging Plan {} due to: {}", plan_id, reason);
+        warn!(
+            "Compliance Engine: Flagging Plan {} due to: {}",
+            plan_id, reason
+        );
 
         let mut tx = self.db.begin().await?;
 
@@ -197,7 +205,7 @@ impl ComplianceEngine {
             SET is_flagged = true, 
                 suspicion_flags = COALESCE(suspicion_flags || ' | ', '') || $1
             WHERE id = $2
-            "#
+            "#,
         )
         .bind(&reason)
         .bind(plan_id)
@@ -236,12 +244,7 @@ mod tests {
     #[tokio::test]
     async fn test_compliance_engine_new() {
         let db = PgPool::connect_lazy("postgres://localhost/test").unwrap();
-        let engine = ComplianceEngine::new(
-            db,
-            5,
-            15,
-            dec!(50000),
-        );
+        let engine = ComplianceEngine::new(db, 5, 15, dec!(50000));
         assert_eq!(engine.velocity_threshold, 5);
         assert_eq!(engine.velocity_window_mins, 15);
         assert_eq!(engine.volume_threshold, dec!(50000));
